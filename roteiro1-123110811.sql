@@ -2,6 +2,7 @@
 
 CREATE TABLE automovel (
 placa CHAR(7),
+dono CHAR(7),
 chassi CHAR(17),
 marca VARCHAR,
 modelo VARCHAR);
@@ -63,3 +64,6 @@ ALTER TABLE seguro ADD PRIMARY KEY (id);
 ALTER TABLE sinistro ADD PRIMARY KEY (id);
 ALTER TABLE pericia ADD PRIMARY KEY (id);
 ALTER TABLE reparo ADD PRIMARY KEY (id);
+
+-- 4
+ALTER TABLE perito ADD CONSTRAINT perito_automovel_atual_fkey FOREIGN KEY (automovel_atual) REFERENCES automovel (placa);
