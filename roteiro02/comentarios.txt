@@ -1,0 +1,22 @@
+-- 1
+Erros Ocorridos:
+ERROR:  value too long for type character(11)
+ERROR:  value too long for type character(1)
+
+Erros esperados. Sem solução necessária
+
+-- 2
+Erros Ocorridos:
+ERROR:  integer out of range
+
+Solução:
+ALTER TABLE tarefas ALTER COLUMN id TYPE char(10);
+
+-- 3
+ALTER TABLE tarefas ADD CONSTRAINT setor_valido CHECK (setor < 32768);
+
+Erros Ocorridos:
+ERROR:  new row for relation "tarefas" violates check constraint "setor_valido"
+ERROR:  new row for relation "tarefas" violates check constraint "setor_valido"
+
+Erros esperados. Sem solução necessária
