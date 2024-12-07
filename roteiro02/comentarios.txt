@@ -1,22 +1,149 @@
 -- 1
 Erros Ocorridos:
-ERROR:  value too long for type character(11)
-ERROR:  value too long for type character(1)
+    ERROR:  value too long for type character(11)
+    ERROR:  value too long for type character(1)
 
 Erros esperados. Sem solução necessária
 
 -- 2
 Erros Ocorridos:
-ERROR:  integer out of range
+    ERROR:  integer out of range
 
 Solução:
-ALTER TABLE tarefas ALTER COLUMN id TYPE char(10);
+    ALTER TABLE tarefas ALTER COLUMN id TYPE char(10);
 
 -- 3
-ALTER TABLE tarefas ADD CONSTRAINT setor_valido CHECK (setor < 32768);
+ALTER TABLE tarefas ALTER COLUMN id TYPE char(10);
 
 Erros Ocorridos:
-ERROR:  new row for relation "tarefas" violates check constraint "setor_valido"
-ERROR:  new row for relation "tarefas" violates check constraint "setor_valido"
+    ERROR:  new row for relation "tarefas" violates check constraint "setor_valido"
+    ERROR:  new row for relation "tarefas" violates check constraint "setor_valido"
 
 Erros esperados. Sem solução necessária
+
+-- 4
+Erros Ocorridos:
+    ERROR:  column "id" of relation "tarefas" contains null values
+    ERROR:  column "descricao" of relation "tarefas" contains null values
+    ERROR:  column "func_resp_cpf" of relation "tarefas" contains null values
+    ERROR:  column "prioridade" of relation "tarefas" contains null values
+    ERROR:  column "status" of relation "tarefas" contains null values
+
+Solução:
+    SELECT FROM tarefas WHERE id IS NULL;
+    DELETE FROM tarefas WHERE id IS NULL;
+
+-- 5
+ALTER TABLE tarefas ADD CONSTRAINT id_unico UNIQUE (id);
+
+-- 6
+    -- a
+    func_resp_cpf já possui tipo char(11) 
+
+    -- b
+    UPDATE tarefas SET status = 'P' where status = 'A';
+    UPDATE tarefas SET status = 'C' where status = 'F';
+    ALTER TABLE tarefas ADD CONSTRAINT tarefa_chk_status_valido CHECK (status IN ('P','E','C'));
+
+-- 7
+SELECT FROM tarefas WHERE prioridade > 5;
+UPDATE tarefas SET prioridade = 5 WHERE prioridade > 5;
+ALTER TABLE tarefas ADD CONSTRAINT tarefas_chk_prioridade_valida CHECK (prioridade >=0 AND prioridade <= 5);
+
+-- 8
+CREATE TABLE funcionario(
+    cpf char(11) PRIMARY KEY,
+    data_nasc char(10) NOT NULL,
+    nome varchar NOT NULL,
+    funcao varchar(11) NOT NULL,
+    nivel char(1) NOT NULL,
+    superior_cpf char(11) REFERENCES funcionario(cpf),
+    CHECK ((funcao = 'SUP_LIMPEZA') OR ((funcao = 'LIMPEZA') AND (superior_cpf IS NOT NULL))),
+    CHECK (nivel IN ('J','P','S')) 
+);
+
+Erros Ocorridos:
+    ERROR:  new row for relation "funcionario" violates check constraint "funcionario_check"
+    DETAIL:  Failing row contains (12345678913, 1980-04-09, joao da Silva, LIMPEZA, J, null).
+
+Erros esperados. Sem solução necessária
+
+
+-- 9
+Inserções Funcionais:
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678920', '1904-09-17', 'Virginia Delgado', 'SUP_LIMPEZA', 'S', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678914', '1989-01-20', 'Rooney Sanchez', 'SUP_LIMPEZA', 'S', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678915', '1998-04-21', 'Veronica Alvarado', 'SUP_LIMPEZA', 'P', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678916', '1994-08-22', 'Clark Best', 'LIMPEZA', 'J', '12345678920');
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678917', '1970-08-21', 'Kieran Eaton', 'SUP_LIMPEZA', 'S', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678918', '1986-05-13', 'Lara Reilly', 'SUP_LIMPEZA', 'P', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678919', '1976-09-11', 'Gary Trujillo', 'LIMPEZA', 'J', '12345678920');
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678921', '1985-10-19', 'Jacqueline Holman', 'SUP_LIMPEZA', 'P', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678922', '1991-08-18', 'Joan Haney', 'LIMPEZA', 'J', '12345678920');
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678923', '1982-12-02', 'Arthur Griffin', 'SUP_LIMPEZA', 'S', null);
+
+Inserções Falhas:
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES (null, '1989-01-20', 'Rooney Sanchez', 'SUP_LIMPEZA', 'S', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678930', null, 'Virginia Delgado', 'SUP_LIMPEZA', 'S', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678940', '1994-08-22', null, 'LIMPEZA', 'J', '12345678920');
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678960', '1986-05-13', 'Lara Reilly', null, 'P', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678970', '1970-08-21', 'Kieran Eaton', 'SUP_LIMPEZA', null, null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678999', '1991-08-18', 'Joan Haney', 'LIMPEZA', 'J', '00000000000');
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678991', '1982-12-02', 'Arthur Griffin', 'CARGO', 'S', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678950', '1998-04-21', 'Veronica Alvarado', 'SUP_LIMPEZA', 'X', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('1234567880', '1985-10-19', 'Jacqueline Holman', 'LIMPEZA', 'P', null);
+    INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('12345678990', '1976-09-11', 'Gary Trujillo', 'LIMPEZA', 'J', '1234567');
+
+Erros:
+    ERROR:  null value in column "cpf" of relation "funcionario" violates not-null constraint
+    DETAIL:  Failing row contains (null, 1989-01-20, Rooney Sanchez, SUP_LIMPEZA, S, null).
+    ERROR:  null value in column "data_nasc" of relation "funcionario" violates not-null constraint
+    DETAIL:  Failing row contains (12345678930, null, Virginia Delgado, SUP_LIMPEZA, S, null).
+    ERROR:  null value in column "nome" of relation "funcionario" violates not-null constraint
+    DETAIL:  Failing row contains (12345678940, 1994-08-22, null, LIMPEZA, J, 12345678920).
+    ERROR:  null value in column "funcao" of relation "funcionario" violates not-null constraint
+    DETAIL:  Failing row contains (12345678960, 1986-05-13, Lara Reilly, null, P, null).
+    ERROR:  null value in column "nivel" of relation "funcionario" violates not-null constraint
+    DETAIL:  Failing row contains (12345678970, 1970-08-21, Kieran Eaton, SUP_LIMPEZA, null, null).
+    ERROR:  insert or update on table "funcionario" violates foreign key constraint "funcionario_superior_cpf_fkey"
+    DETAIL:  Key (superior_cpf)=(00000000000) is not present in table "funcionario".
+    ERROR:  new row for relation "funcionario" violates check constraint "funcionario_check"
+    DETAIL:  Failing row contains (12345678991, 1982-12-02, Arthur Griffin, CARGO, S, null).
+    ERROR:  new row for relation "funcionario" violates check constraint "funcionario_nivel_check"
+    DETAIL:  Failing row contains (12345678950, 1998-04-21, Veronica Alvarado, SUP_LIMPEZA, X, null).
+    ERROR:  new row for relation "funcionario" violates check constraint "funcionario_check"
+    DETAIL:  Failing row contains (1234567880 , 1985-10-19, Jacqueline Holman, LIMPEZA, P, null).
+    ERROR:  insert or update on table "funcionario" violates foreign key constraint "funcionario_superior_cpf_fkey"
+    DETAIL:  Key (superior_cpf)=(1234567    ) is not present in table "funcionario".
+
+-- 10
+    -- 10.1
+    Erros Ocorridos:
+        ERROR:  insert or update on table "tarefas" violates foreign key constraint "tarefas_func_resp_cpf_fkey"
+        DETAIL:  Key (func_resp_cpf)=(98765432111) is not present in table "funcionario".
+
+    Solução:
+        INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('98765432111', '1980-02-21', 'Xyla Ramirez', 'SUP_LIMPEZA', 'S', null);
+        INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('98765432122', '1987-11-03', 'Nina Howard', 'SUP_LIMPEZA', 'S', null);
+        INSERT INTO funcionario (cpf, data_nasc, nome, funcao, nivel, superior_cpf) VALUES ('32323232911', '1988-08-12', 'Jennifer Patrick', 'SUP_LIMPEZA', 'S', null);
+        
+    -- 10.2
+    Erros Ocorridos:
+        ERROR:  update or delete on table "funcionario" violates foreign key constraint "tarefas_func_resp_cpf_fkey" on table "tarefas"
+        DETAIL:  Key (cpf)=(98765432111) is still referenced from table "tarefas".
+
+    Erros esperados. Sem solução necessária
+
+-- 11
+    ALTER TABLE tarefas ADD CONSTRAINT tarefa_chk_func_valido CHECK ((func_resp_cpf IS NOT NULL) OR (status = 'P'));
+
+    Erros Ocorridos:
+        ERROR:  new row for relation "tarefas" violates check constraint "tarefa_chk_func_valido"
+        DETAIL:  Failing row contains (2147483646, limpar chão do corredor central, null, 0, C).
+        CONTEXT:  SQL statement "UPDATE ONLY "public"."tarefas" SET "func_resp_cpf" = NULL WHERE $1 OPERATOR(pg_catalog.=) "func_resp_cpf""
+
+        ERROR:  new row for relation "tarefas" violates check constraint "tarefa_chk_func_valido"
+        DETAIL:  Failing row contains (2147483647, limpar janelas da sala 203, null, 1, E).
+        CONTEXT:  SQL statement "UPDATE ONLY "public"."tarefas" SET "func_resp_cpf" = NULL WHERE $1 OPERATOR(pg_catalog.=) "func_resp_cpf""
+    
+    Erros esperados. Sem solução necessária
