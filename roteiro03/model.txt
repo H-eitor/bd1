@@ -1,0 +1,25 @@
+--TABLES
+
+Farmácias:
+    id
+    bairro
+    cidade
+    estado
+
+Funcionários:
+    cpf
+    nome
+    cargo (farm, vend, entr, caix ou adm)
+    
+
+
+
+Medicamentos:
+
+Vendas:
+
+Entregas:
+
+Clientes:
+
+Localização?:
