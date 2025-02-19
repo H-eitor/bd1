@@ -25,7 +25,7 @@ SELECT fname FROM employee WHERE sex='M' AND superssn IS NULL;
 --9
 SELECT f.fname AS funcionario, s.fname AS supervisor FROM employee AS f, employee AS s WHERE f.superssn = s.ssn;
 
---10 TODO
+--10
 SELECT f.fname FROM employee AS f, employee AS s WHERE f.superssn = s.ssn AND s.fname = 'Franklin';
 
 --11
@@ -38,7 +38,7 @@ SELECT dname FROM department WHERE dname LIKE 'S%';
 SELECT e.fname, e.lname, d.dependent_name FROM employee e, dependent d WHERE d.essn = e.ssn;
 
 --14
-SELECT fname || minit || lname full_name, salary from employee WHERE salary > 50000;
+SELECT fname || ' ' || minit || ' ' || lname full_name, salary from employee WHERE salary > 50000;
 
 --15
 SELECT p.pname, d.dname FROM project p, department d WHERE p.dnum = d.dnumber; 

@@ -22,4 +22,4 @@ Repositório pare armazenamento dos roteiros utilizados na cadeira Banco de Dado
 
 ### Alterar o search_path para company
 
-> SET search_path TO company_public;
+> SET search_path TO company,public;
