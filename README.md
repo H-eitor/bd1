@@ -2,7 +2,7 @@ Repositório pare armazenamento dos roteiros utilizados na cadeira Banco de Dado
 
 ### Acesso à VM
 
-> $ ssh -o ServerAliveInternal=30 heitordsa@150.165.85.18 -p 45600
+> $ ssh heitordsa@150.165.85.18 -p 45600
 
 ### Acesso ao PSQL
 
@@ -19,3 +19,7 @@ Repositório pare armazenamento dos roteiros utilizados na cadeira Banco de Dado
 
 - Fora da VM
 > $ scp -P 45600 heitordsa@150.165.85.18:/home/heitordsa/roteiro2-dump-123110811.sql .
+
+### Alterar o search_path para company
+
+> SET search_path TO company_public;
