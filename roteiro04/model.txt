@@ -1,24 +1,9 @@
-Não utilizar:
-- LIMIT
-- WITH
-- CASE / WHEN
-- EXISTS
-- Consultas aninhadas
-- IN, SOME, ANY, ALL
-- JOIN
+Correções:
 
-1..6 SELECT * FROM <nome_tabela>
+12:
+    Result: -(Not Returned Expected Items: ('Administration') ('Research'))
+    Syntax: Expected elements not found in the query: -AND
+    Structure: Expected relations: department, dept_locations
 
-7. SELECT fname, lname FROM employee WHERE sex='M'
-
-8. SELECT fname FROM employee WHERE sex='M' AND superssn=NULL
-
-// TESTAR
-9. SELECT f.fname AS funcionario, s.fname AS supervisor FROM employee AS f, employee AS s WHERE f.superssn = s.ssn
-
-// TENTAR FAZER SEM UM 'JOIN' DESNECESSÁRIO
-10. SELECT fname FROM employee WHERE 
-
-// LOCALIZAÇÃO DO DEPARTAMENTO NÃO NECESSARIAMENTE SIGNIFICA ENDEREÇO
-// RISCO DE 'JOIN' DESNECESSÁRIO
-11. SELECT dname, 
+    Correção:
+        SELECT dname FROM department D, dept_locations l WHERE d.dnumber = l.dnumber AND dlocation LIKE 'S%';
