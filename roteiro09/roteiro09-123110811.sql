@@ -34,57 +34,43 @@ DROP VIEW vw_deptstats;
 DROP VIEW vw_projstats;
 
 -- 4
-
--- TODO AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 CREATE OR REPLACE FUNCTION check_age(input char(9))
 RETURNS varchar AS 
 $$
-
 DECLARE
-idade INT;
-
+bday DATE;
 BEGIN
-    SELECT EXTRACT('YEAR' FROM AGE(CURRENT_DATE, e.bdate)) INTO idade
-    FROM employee e WHERE e.ssn = $1;
+    SELECT e.bdate INTO bday
+    FROM employee e WHERE e.ssn = input;
 
-	IF (idade IS NULL) THEN RETURN 'UNKNOWN';
-	ELSIF (idade > 50) THEN RETURN 'SENIOR';
-	ELSIF (idade < 0) THEN RETURN 'INVALID';
+	IF (bday IS NULL) THEN RETURN 'UNKNOWN';
+	ELSIF (DATE_PART('YEAR', AGE(bday)) > 50) THEN RETURN 'SENIOR';
+	ELSIF (DATE_PART('YEAR', AGE(bday)) < 0) THEN RETURN 'INVALID';
     ELSE RETURN 'YOUNG';
 	END IF;
-   	 
 END;
 $$  LANGUAGE plpgsql;
 
 -- 5
--- TODO PORQUE REQUER A 4
-CREATE OR REPLACE FUNCTION check_mgr(param_name PARAM_TYPE)
-RETURNS RETURN_TYPE AS
+CREATE OR REPLACE FUNCTION trigfunc_check_mgr ()
+RETURNS trigger AS
 $$
-
 DECLARE
-var1_name VAR1_TYPE;
-var2_name VAR2_TYPE;
-var3_name VAR3_TYPE;
-
+dep INT;
 BEGIN
-    
-	IF (CONDITION) THEN
-        	...
-	ELSIF (CONDITION) THEN
-        	...
+    SELECT dno INTO dep
+    FROM employee WHERE ssn = NEW.mgrssn;
+
+	IF (dep IS NULL OR dep <> NEW.dnumber) THEN
+        RAISE EXCEPTION 'manager must be a department''s employee';
+	ELSIF (NOT EXISTS (SELECT e.superssn FROM employee e WHERE e.superssn = NEW.mgrssn)) THEN
+        RAISE EXCEPTION 'manager must have supevisees';
+	ELSIF (check_age(NEW.mgrssn) <> 'SENIOR') THEN
+        RAISE EXCEPTION 'manager must be a SENIOR employee';
+    ELSE RETURN NEW;
 	END IF;
-   	 
 END;
 $$  LANGUAGE plpgsql;
 
-
-
-
-CREATE OR REPLACE FUNCTION increment(i char(1)) RETURNS varchar AS $$
-DECLARE
-    idade INT;
-BEGIN
-    RETURN 'a';
-END;
-$$ LANGUAGE plpgsql;
+CREATE TRIGGER check_mgr BEFORE INSERT OR UPDATE ON department
+    FOR EACH ROW EXECUTE FUNCTION trigfunc_check_mgr();
